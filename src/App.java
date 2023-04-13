@@ -1,4 +1,5 @@
 import java.math.BigInteger;
+import java.security.MessageDigest;
 
 public class App {
     public static void main(String[] args) throws Exception {
@@ -12,7 +13,10 @@ public class App {
                 new BigInteger("4FE342E2FE1A7F9B8EE7EB4A7C0F9E162BCE33576B315ECECBB6406837BF51F5", 16));
         BigInteger n = new BigInteger("FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551", 16);
 
-        byte[] hash = "Hello World!".getBytes();
+        byte[] message = "Hello World!".getBytes();
+        MessageDigest messageDigest = MessageDigest.getInstance("SHA-256"); // INI DIGANTI DENGAN ALGORITMA GAGAS
+        byte[] hash = messageDigest.digest(message);
+
         BigInteger hashedValue = new BigInteger(1, hash);
 
         Key key = new Key(ellipticalCurve, basePoint, n);
