@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.security.PrivateKey;
@@ -13,7 +14,8 @@ public class DigitalSigning extends EllipticalCurveCryptography {
         this.rawPrivateKey = new BigInteger(1, encodedPrivateKey);
     }
 
-    public Point getSigning(BigInteger hashedValue) {
+    public byte[] getSigning(byte[] hash) throws IOException {
+        BigInteger hashedValue = new BigInteger(1, hash);
         BigInteger r, s;
 
         do {
@@ -28,6 +30,8 @@ public class DigitalSigning extends EllipticalCurveCryptography {
             s = k.modInverse(n).multiply(hashedValue.add(rawPrivateKey.multiply(r))).mod(n);
         } while (r.compareTo(BigInteger.ZERO) == 0 || s.compareTo(BigInteger.ZERO) == 0);
 
-        return new Point(r, s);
+        Point point = new Point(r, s);
+
+        return point.toByteArray();
     }
 }

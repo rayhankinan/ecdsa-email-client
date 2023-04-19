@@ -2,7 +2,6 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.util.Arrays;
 
 public class App {
     public static void main(String[] args) throws Exception {
@@ -20,27 +19,24 @@ public class App {
         MessageDigest messageDigest = MessageDigest.getInstance("SHA-256"); // INI DIGANTI DENGAN ALGORITMA GAGAS
         byte[] hash = messageDigest.digest(message);
 
-        BigInteger hashedValue = new BigInteger(1, hash);
-
         EllipticalCurveKeyStore ellipticalCurveKeyStore = new EllipticalCurveKeyStore("key/example.p12",
                 "password");
         ellipticalCurveKeyStore.load();
 
         PrivateKey readPrivateKey = ellipticalCurveKeyStore.read();
 
-        PrivateKey initialPrivateKey = EllipticalCurveKey.generatePrivateKey(ellipticalCurve, basePoint, n);
-        ellipticalCurveKeyStore.save(initialPrivateKey);
-        ellipticalCurveKeyStore.store();
-
-        System.out.println("Read: " + Arrays.toString(readPrivateKey.getEncoded()));
+        // PrivateKey initialPrivateKey =
+        // EllipticalCurveKey.generatePrivateKey(ellipticalCurve, basePoint, n);
+        // ellipticalCurveKeyStore.save(initialPrivateKey);
+        // ellipticalCurveKeyStore.store();
 
         PublicKey publicKey = EllipticalCurveKey.generatePublicKey(ellipticalCurve, basePoint, n, readPrivateKey);
 
         DigitalSigning digitalSigning = new DigitalSigning(ellipticalCurve, basePoint, n, readPrivateKey);
-        Point sign = digitalSigning.getSigning(hashedValue);
+        byte[] sign = digitalSigning.getSigning(hash);
 
         DigitalVerifying digitalVerifying = new DigitalVerifying(ellipticalCurve, basePoint, n, publicKey);
-        boolean result = digitalVerifying.verifySigning(hashedValue, sign);
+        boolean result = digitalVerifying.verifySigning(hash, sign);
         System.out.println(result);
     }
 }

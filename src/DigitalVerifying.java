@@ -14,9 +14,12 @@ public class DigitalVerifying extends EllipticalCurveCryptography {
         this.rawPublicKey = new Point(encodedPrivateKey);
     }
 
-    public boolean verifySigning(BigInteger hashedValue, Point sign) {
-        BigInteger r = sign.getX();
-        BigInteger s = sign.getY();
+    public boolean verifySigning(byte[] hash, byte[] sign) throws IOException {
+        Point point = new Point(sign);
+        BigInteger hashedValue = new BigInteger(1, hash);
+
+        BigInteger r = point.getX();
+        BigInteger s = point.getY();
 
         BigInteger w = s.modInverse(n);
         BigInteger u1 = hashedValue.multiply(w).mod(n);
