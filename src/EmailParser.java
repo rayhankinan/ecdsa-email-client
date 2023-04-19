@@ -1,6 +1,5 @@
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -15,6 +14,33 @@ public class EmailParser {
             new BigInteger("6B17D1F2E12C4247F8BCE6E563A440F277037D812DEB33A0F4A13945D898C296", 16),
             new BigInteger("4FE342E2FE1A7F9B8EE7EB4A7C0F9E162BCE33576B315ECECBB6406837BF51F5", 16));
     public static BigInteger n = new BigInteger("FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551", 16);
+
+    public static String exportPrivateKey(PrivateKey privateKey) {
+        byte[] encodedPrivateKey = privateKey.getEncoded();
+
+        return Base64.getEncoder().encodeToString(encodedPrivateKey);
+    }
+
+    public static PrivateKey importPrivateKey(String rawPrivateKey) {
+        byte[] decodedPrivateKey = Base64.getDecoder().decode(rawPrivateKey);
+
+        return new PrivateKey() {
+            @Override
+            public String getAlgorithm() {
+                return "ECDSA";
+            }
+
+            @Override
+            public String getFormat() {
+                return "PKCS#8";
+            }
+
+            @Override
+            public byte[] getEncoded() {
+                return decodedPrivateKey;
+            }
+        };
+    }
 
     public static String exportPublicKey(PublicKey publicKey) {
         byte[] encodedPublicKey = publicKey.getEncoded();
@@ -55,6 +81,11 @@ public class EmailParser {
         return EllipticalCurveKey.generatePrivateKey(EmailParser.ellipticalCurve, EmailParser.basePoint, EmailParser.n);
     }
 
+    public static PublicKey generatePublicKey(PrivateKey privateKey) throws IOException {
+        return EllipticalCurveKey.generatePublicKey(EmailParser.ellipticalCurve, EmailParser.basePoint, EmailParser.n,
+                privateKey);
+    }
+
     public static PrivateKey getOrGeneratePrivateKey() {
         PrivateKey privateKey;
 
@@ -83,8 +114,9 @@ public class EmailParser {
     public static String signMessage(PrivateKey privateKey, String message)
             throws NoSuchAlgorithmException, IOException {
         byte[] rawMessage = message.getBytes();
-        MessageDigest messageDigest = MessageDigest.getInstance("SHA-256"); // INI DIGANTI DENGAN ALGORITMA GAGAS
-        byte[] hash = messageDigest.digest(rawMessage);
+
+        Keccak keccak = new Keccak();
+        byte[] hash = keccak.hash(rawMessage);
 
         DigitalSigning digitalSigning = new DigitalSigning(EmailParser.ellipticalCurve, EmailParser.basePoint,
                 EmailParser.n, privateKey);
@@ -102,8 +134,9 @@ public class EmailParser {
     public static boolean verifyMessage(String message, String sign, String publicKey)
             throws NoSuchAlgorithmException, IOException {
         byte[] rawMessage = message.getBytes();
-        MessageDigest messageDigest = MessageDigest.getInstance("SHA-256"); // INI DIGANTI DENGAN ALGORITMA GAGAS
-        byte[] hash = messageDigest.digest(rawMessage);
+
+        Keccak keccak = new Keccak();
+        byte[] hash = keccak.hash(rawMessage);
 
         PublicKey rawPublicKey = EmailParser.importPublicKey(publicKey);
         byte[] rawSign = EmailParser.importSignature(sign);
