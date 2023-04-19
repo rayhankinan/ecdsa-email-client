@@ -71,7 +71,7 @@ public class EllipticalCurve {
         BigInteger tempK = k.subtract(BigInteger.ONE);
 
         while (tempK.compareTo(BigInteger.ZERO) == 1) {
-            if (tempK.mod(BigInteger.TWO).equals(BigInteger.ONE)) {
+            if (tempK.mod(BigInteger.valueOf(2)).equals(BigInteger.ONE)) {
                 sum = this.addPoint(sum, tempP);
             }
 
