@@ -32,7 +32,7 @@ public class EllipticalCurveKey {
 
             @Override
             public byte[] getEncoded() {
-                return encodedPrivateKey;
+                return encodedPrivateKeyCopy;
             }
         };
     }
