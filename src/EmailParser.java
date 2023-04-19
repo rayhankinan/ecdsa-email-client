@@ -1,43 +1,15 @@
-import java.math.BigInteger;
-import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.Base64;
 
 public class EmailParser {
-    public static String exportPrivateKey(PrivateKey privateKey) {
-        byte[] encodedPrivateKey = privateKey.getEncoded();
-
-        return new String(encodedPrivateKey);
-    }
-
-    public static PrivateKey importPrivateKey(String rawPrivateKey) {
-        byte[] encodedPrivateKey = rawPrivateKey.getBytes();
-
-        return new PrivateKey() {
-            @Override
-            public String getAlgorithm() {
-                return "ECDSA";
-            }
-
-            @Override
-            public String getFormat() {
-                return "PKCS#8";
-            }
-
-            @Override
-            public byte[] getEncoded() {
-                return encodedPrivateKey;
-            }
-        };
-    }
-
     public static String exportPublicKey(PublicKey publicKey) {
         byte[] encodedPublicKey = publicKey.getEncoded();
 
-        return new String(encodedPublicKey);
+        return Base64.getEncoder().encodeToString(encodedPublicKey);
     }
 
     public static PublicKey importPublicKey(String rawPublicKey) {
-        byte[] encodedPublicKey = rawPublicKey.getBytes();
+        byte[] decodedPublicKey = Base64.getDecoder().decode(rawPublicKey);
 
         return new PublicKey() {
             @Override
@@ -52,20 +24,18 @@ public class EmailParser {
 
             @Override
             public byte[] getEncoded() {
-                return encodedPublicKey;
+                return decodedPublicKey;
             }
         };
     }
 
     public static String exportSignature(byte[] signature) {
-        BigInteger signatureValue = new BigInteger(1, signature);
-
-        return signatureValue.toString(16);
+        return Base64.getEncoder().encodeToString(signature);
     }
 
     public static byte[] importSignature(String rawSignature) {
-        BigInteger signatureValue = new BigInteger(rawSignature, 16);
+        byte[] decodedSignature = Base64.getDecoder().decode(rawSignature);
 
-        return signatureValue.toByteArray();
+        return decodedSignature;
     }
 }
