@@ -1,5 +1,7 @@
 import java.math.BigInteger;
 import java.security.MessageDigest;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 
 public class App {
     public static void main(String[] args) throws Exception {
@@ -19,15 +21,16 @@ public class App {
 
         BigInteger hashedValue = new BigInteger(1, hash);
 
-        Key key = new Key(ellipticalCurve, basePoint, n);
-        BigInteger privateKey = key.getPrivateKey();
-        Point publicKey = key.getPublicKey();
+        for (int i = 0; i < 1000; i++) {
+            PrivateKey privateKey = EllipticalCurveKey.generatePrivateKey(ellipticalCurve, basePoint, n);
+            PublicKey publicKey = EllipticalCurveKey.generatePublicKey(ellipticalCurve, basePoint, n, privateKey);
 
-        DigitalSigning digitalSigning = new DigitalSigning(ellipticalCurve, basePoint, n, privateKey);
-        Point sign = digitalSigning.getSigning(hashedValue);
+            DigitalSigning digitalSigning = new DigitalSigning(ellipticalCurve, basePoint, n, privateKey);
+            Point sign = digitalSigning.getSigning(hashedValue);
 
-        DigitalVerifying digitalVerifying = new DigitalVerifying(ellipticalCurve, basePoint, n, publicKey);
-        boolean result = digitalVerifying.verifySigning(hashedValue, sign);
-        System.out.println(result);
+            DigitalVerifying digitalVerifying = new DigitalVerifying(ellipticalCurve, basePoint, n, publicKey);
+            boolean result = digitalVerifying.verifySigning(hashedValue, sign);
+            System.out.println(result);
+        }
     }
 }

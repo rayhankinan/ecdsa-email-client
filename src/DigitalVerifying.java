@@ -1,12 +1,17 @@
+import java.io.IOException;
 import java.math.BigInteger;
+import java.security.PublicKey;
 
 public class DigitalVerifying extends EllipticalCurveCryptography {
-    private Point publicKey;
+    private Point rawPublicKey;
 
-    public DigitalVerifying(EllipticalCurve curve, Point basePoint, BigInteger n, Point publicKey) {
+    public DigitalVerifying(EllipticalCurve curve, Point basePoint, BigInteger n, PublicKey publicKey)
+            throws IOException {
         super(curve, basePoint, n);
 
-        this.publicKey = publicKey;
+        byte[] encodedPrivateKey = publicKey.getEncoded();
+
+        this.rawPublicKey = new Point(encodedPrivateKey);
     }
 
     public boolean verifySigning(BigInteger hashedValue, Point sign) {
@@ -19,7 +24,7 @@ public class DigitalVerifying extends EllipticalCurveCryptography {
 
         Point P = this.curve.addPoint(
                 this.curve.multiplyPoint(this.basePoint, u1),
-                this.curve.multiplyPoint(this.publicKey, u2));
+                this.curve.multiplyPoint(this.rawPublicKey, u2));
 
         if (P.isZero()) {
             return false;
