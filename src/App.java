@@ -26,14 +26,17 @@ public class App {
                 "password");
         ellipticalCurveKeyStore.load();
 
-        PrivateKey initialPrivateKey = EllipticalCurveKey.generatePrivateKey(ellipticalCurve, basePoint, n);
-        ellipticalCurveKeyStore.save(initialPrivateKey);
-
         PrivateKey readPrivateKey = ellipticalCurveKeyStore.read();
+        if (readPrivateKey == null) {
+            PrivateKey initialPrivateKey = EllipticalCurveKey.generatePrivateKey(ellipticalCurve, basePoint, n);
+            ellipticalCurveKeyStore.save(initialPrivateKey);
+
+            System.out.println("Initial: " + Arrays.toString(initialPrivateKey.getEncoded()));
+        }
+
         ellipticalCurveKeyStore.store();
 
-        System.out.println(Arrays.toString(initialPrivateKey.getEncoded()));
-        System.out.println(Arrays.toString(readPrivateKey.getEncoded()));
+        System.out.println("Read: " + Arrays.toString(readPrivateKey.getEncoded()));
 
         PublicKey publicKey = EllipticalCurveKey.generatePublicKey(ellipticalCurve, basePoint, n, readPrivateKey);
 
