@@ -2,6 +2,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.Arrays;
 
 public class App {
     public static void main(String[] args) throws Exception {
@@ -21,16 +22,26 @@ public class App {
 
         BigInteger hashedValue = new BigInteger(1, hash);
 
-        for (int i = 0; i < 1000; i++) {
-            PrivateKey privateKey = EllipticalCurveKey.generatePrivateKey(ellipticalCurve, basePoint, n);
-            PublicKey publicKey = EllipticalCurveKey.generatePublicKey(ellipticalCurve, basePoint, n, privateKey);
+        EllipticalCurveKeyStore ellipticalCurveKeyStore = new EllipticalCurveKeyStore("key/example.p12",
+                "password");
+        ellipticalCurveKeyStore.load();
 
-            DigitalSigning digitalSigning = new DigitalSigning(ellipticalCurve, basePoint, n, privateKey);
-            Point sign = digitalSigning.getSigning(hashedValue);
+        PrivateKey initialPrivateKey = EllipticalCurveKey.generatePrivateKey(ellipticalCurve, basePoint, n);
+        ellipticalCurveKeyStore.save(initialPrivateKey);
 
-            DigitalVerifying digitalVerifying = new DigitalVerifying(ellipticalCurve, basePoint, n, publicKey);
-            boolean result = digitalVerifying.verifySigning(hashedValue, sign);
-            System.out.println(result);
-        }
+        PrivateKey readPrivateKey = ellipticalCurveKeyStore.read();
+        ellipticalCurveKeyStore.store();
+
+        System.out.println(Arrays.toString(initialPrivateKey.getEncoded()));
+        System.out.println(Arrays.toString(readPrivateKey.getEncoded()));
+
+        PublicKey publicKey = EllipticalCurveKey.generatePublicKey(ellipticalCurve, basePoint, n, readPrivateKey);
+
+        DigitalSigning digitalSigning = new DigitalSigning(ellipticalCurve, basePoint, n, readPrivateKey);
+        Point sign = digitalSigning.getSigning(hashedValue);
+
+        DigitalVerifying digitalVerifying = new DigitalVerifying(ellipticalCurve, basePoint, n, publicKey);
+        boolean result = digitalVerifying.verifySigning(hashedValue, sign);
+        System.out.println(result);
     }
 }

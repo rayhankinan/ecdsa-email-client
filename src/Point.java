@@ -78,8 +78,8 @@ public class Point {
         /* Handle X */
         byte[] rawX = this.x.toByteArray();
         byte[] reversedX = new byte[32];
-        Arrays.fill(reversedX, (byte) 0);
 
+        Arrays.fill(reversedX, (byte) 0);
         for (int i = 0; i < Math.min(rawX.length, 32); i++) {
             reversedX[i] = rawX[rawX.length - 1 - i];
         }
@@ -87,8 +87,8 @@ public class Point {
         /* Handle Y */
         byte[] rawY = this.y.toByteArray();
         byte[] reversedY = new byte[32];
-        Arrays.fill(reversedY, (byte) 0);
 
+        Arrays.fill(reversedY, (byte) 0);
         for (int i = 0; i < Math.min(rawY.length, 32); i++) {
             reversedY[i] = rawY[rawY.length - 1 - i];
         }
