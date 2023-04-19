@@ -55,9 +55,29 @@ public class EmailParser {
         return EllipticalCurveKey.generatePrivateKey(EmailParser.ellipticalCurve, EmailParser.basePoint, EmailParser.n);
     }
 
-    public static PublicKey generatePublicKey(PrivateKey privateKey) throws IOException {
-        return EllipticalCurveKey.generatePublicKey(EmailParser.ellipticalCurve, EmailParser.basePoint, EmailParser.n,
-                privateKey);
+    public static PrivateKey getOrGeneratePrivateKey() {
+        PrivateKey privateKey;
+
+        try {
+            EllipticalCurveKeyStore ellipticalCurveKeyStore = new EllipticalCurveKeyStore("key/example.p12",
+                    "password");
+            ellipticalCurveKeyStore.load();
+
+            privateKey = ellipticalCurveKeyStore.read();
+
+            if (privateKey == null) {
+                PrivateKey initialPrivateKey = EmailParser.generatePrivateKey();
+                ellipticalCurveKeyStore.save(initialPrivateKey);
+                ellipticalCurveKeyStore.store();
+
+                privateKey = initialPrivateKey;
+            }
+
+        } catch (Exception e) {
+            privateKey = EmailParser.generatePrivateKey();
+        }
+
+        return privateKey;
     }
 
     public static String signMessage(PrivateKey privateKey, String message)

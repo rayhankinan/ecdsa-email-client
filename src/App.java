@@ -1,4 +1,5 @@
 import java.security.PrivateKey;
+import java.util.Base64;
 
 public class App {
     public static void main(String[] args) throws Exception {
@@ -13,6 +14,8 @@ public class App {
         // PrivateKey initialPrivateKey = EmailParser.generatePrivateKey();
         // ellipticalCurveKeyStore.save(initialPrivateKey);
         // ellipticalCurveKeyStore.store();
+
+        System.out.println(Base64.getEncoder().encodeToString(readPrivateKey.getEncoded()));
 
         String wholeMessage = EmailParser.signMessage(readPrivateKey, message);
 

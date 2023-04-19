@@ -1,5 +1,4 @@
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.KeyStore;
@@ -15,7 +14,7 @@ public class EllipticalCurveKeyStore {
     public String filename;
     public char[] pwdArray;
 
-    public EllipticalCurveKeyStore(String filename, String password) throws FileNotFoundException, KeyStoreException {
+    public EllipticalCurveKeyStore(String filename, String password) throws KeyStoreException {
         this.keyStore = KeyStore.getInstance("pkcs12");
         this.filename = filename;
         this.pwdArray = password.toCharArray();
