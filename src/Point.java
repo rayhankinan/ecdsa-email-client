@@ -21,6 +21,7 @@ public class Point {
         this.z = P.getZ();
     }
 
+    /* Little Endian */
     public Point(byte[] rawPoint) throws IOException {
         ByteArrayInputStream inputStream = new ByteArrayInputStream(rawPoint);
 
@@ -72,37 +73,30 @@ public class Point {
         return this.x.equals(BigInteger.ZERO) && this.z.equals(BigInteger.ZERO);
     }
 
+    /* Little Endian */
     public byte[] toByteArray() throws IOException {
         /* Handle X */
         byte[] rawX = this.x.toByteArray();
-        byte[] reversedX = new byte[Math.max(rawX.length, 32)];
+        byte[] reversedX = new byte[32];
         Arrays.fill(reversedX, (byte) 0);
 
-        for (int i = 0; i < rawX.length; i++) {
+        for (int i = 0; i < Math.min(rawX.length, 32); i++) {
             reversedX[i] = rawX[rawX.length - 1 - i];
         }
 
-        byte[] tmpX = new byte[32];
-        System.arraycopy(reversedX, 0, tmpX, 0, 32);
-        rawX = tmpX;
-
         /* Handle Y */
         byte[] rawY = this.y.toByteArray();
-        byte[] reversedY = new byte[Math.max(rawY.length, 32)];
+        byte[] reversedY = new byte[32];
         Arrays.fill(reversedY, (byte) 0);
 
-        for (int i = 0; i < rawY.length; i++) {
+        for (int i = 0; i < Math.min(rawY.length, 32); i++) {
             reversedY[i] = rawY[rawY.length - 1 - i];
         }
 
-        byte[] tmpY = new byte[32];
-        System.arraycopy(reversedY, 0, tmpY, 0, 32);
-        rawY = tmpY;
-
         /* Write to Output Stream */
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        outputStream.write(rawX);
-        outputStream.write(rawY);
+        outputStream.write(reversedX);
+        outputStream.write(reversedY);
 
         return outputStream.toByteArray();
     }
